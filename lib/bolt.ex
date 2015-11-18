@@ -1,0 +1,2 @@
+defmodule Bolt do
+end
