@@ -108,6 +108,6 @@ defmodule Bolt.Renderer do
   end
 
   defp extension(path) do
-    String.split(path, ".") |> Enum.reverse |> hd
+    String.split(path, ".") |> Enum.reverse |> hd |> String.to_atom
   end
 end
