@@ -15,12 +15,14 @@ defmodule Bolt.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger]]
+    [applications: [:logger, :yaml_elixir]]
   end
 
   defp deps do
     [
       {:earmark, "~> 0.1.15"},
+      { :yaml_elixir, github: "KamilLelonek/yaml-elixir" },
+      { :yamerl, github: "yakaz/yamerl" }
     ]
   end
 end

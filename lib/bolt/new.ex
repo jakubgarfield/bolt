@@ -22,7 +22,7 @@ defmodule Bolt.Template do
 """
 <html>
 <head>
-  <title><%= @title %></title>
+  <title><%= @item.title %></title>
 </head>
 <body>
   <%= @content %>
@@ -107,9 +107,9 @@ end
 
 defmodule Bolt.Renderer do
   def render({path, content, layout}) do
-    #{metadata, pure_content} = parse_metadata(content)
-    compiled_content = transform(content, [], extension(path))
-    {replace_extension(path), transform(layout, [content: compiled_content], :eex)}
+    {metadata, content_without_metadata} = parse_metadata(content)
+    compiled_content = transform(content_without_metadata, [], extension(path))
+    {replace_extension(path), transform(layout, [content: compiled_content, item: metadata], :eex)}
   end
 
   defp transform(content, _, :md) do
@@ -135,5 +135,15 @@ defmodule Bolt.Renderer do
   defp remove_extension(path) do
     parts = String.split(path, ".") |> Enum.reverse |> tl |> Enum.reverse
     Enum.join(parts, ".")
+  end
+
+  defp parse_metadata(content) do
+    [_ | [metadata | content_without_metadata]] = String.split(content, "---\n")
+    {yaml_to_dictionary(metadata), Enum.join(content_without_metadata, "---\n")}
+  end
+
+  defp yaml_to_dictionary(yaml) do
+    YamlElixir.read_from_string(yaml)
+    |> Enum.reduce(%{}, fn ({key, val}, acc) -> Map.put(acc, String.to_atom(key), val) end)
   end
 end
