@@ -27,7 +27,7 @@ defmodule Bolt.Template do
 <body>
   <%= @content %>
 </body>
-</html
+</html>
 """
   end
 
@@ -68,9 +68,8 @@ defmodule Bolt.Path do
 end
 
 defmodule Bolt.File do
-  def layouts(location) do
-    Bolt.Path.layout(location)
-    |> File.ls!
+  def layout(location) do
+    File.read!(Path.join(Bolt.Path.layout(location), "application.eex"))
   end
 
   def content_files(location) do
@@ -87,6 +86,7 @@ defmodule Bolt.Compiler do
     File.mkdir(Bolt.Path.output(location))
     Enum.map(Bolt.File.content_files(location), fn(content_file) -> 
       replace_content_path_with_output_path(content_file, location)
+      |> assign_layout
       |> Bolt.Renderer.render
       |> write
     end)
@@ -97,13 +97,19 @@ defmodule Bolt.Compiler do
   end
 
   defp replace_content_path_with_output_path({path, content}, location) do
-    {Bolt.Path.output_path_from(path, location), content}
+    {Bolt.Path.output_path_from(path, location), content, location}
+  end
+
+  defp assign_layout({path, content, location}) do
+    {path, content, Bolt.File.layout(location)}
   end
 end
 
 defmodule Bolt.Renderer do
-  def render({path, content}) do
-    {replace_extension(path), transform(content, [], extension(path))}
+  def render({path, content, layout}) do
+    #{metadata, pure_content} = parse_metadata(content)
+    compiled_content = transform(content, [], extension(path))
+    {replace_extension(path), transform(layout, [content: compiled_content], :eex)}
   end
 
   defp transform(content, _, :md) do
