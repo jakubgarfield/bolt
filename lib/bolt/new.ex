@@ -13,7 +13,7 @@ defmodule Bolt.New do
     File.mkdir!(Bolt.Path.layout(path))
     File.mkdir!(Bolt.Path.content(path))
     File.write!(Path.join(Bolt.Path.layout(path), "application.eex"), Bolt.Template.layout)
-    File.write!(Path.join(Bolt.Path.content(path), "index.eex"), Bolt.Template.index)
+    File.write!(Path.join(Bolt.Path.content(path), "index.md"), Bolt.Template.index)
   end
 end
 
@@ -22,10 +22,10 @@ defmodule Bolt.Template do
 """
 <html>
 <head>
-  <title>Welcome to bolt!</title>
+  <title><%= @title %></title>
 </head>
 <body>
-  <%= yield %>
+  <%= @content %>
 </body>
 </html
 """
@@ -33,8 +33,18 @@ defmodule Bolt.Template do
 
   def index do
 """
-<h1>Welcome to bolt</h1>
-<p>The fastest and most awesome static site generator in Elixir</p>
+---
+title: Welcome to bolt!
+---
+# Welcome to bolt
+
+The fastest and most awesome static site generator in Elixir.
+
+All the awesome features like
+
+* eex support
+* markdown support
+* layouts
 """
   end
 end
@@ -73,6 +83,7 @@ end
 
 defmodule Bolt.Compiler do
   def compile(location) do
+    File.rm_rf(Bolt.Path.output(location))
     File.mkdir(Bolt.Path.output(location))
     Enum.map(Bolt.File.content_files(location), fn(content_file) -> 
       replace_content_path_with_output_path(content_file, location)
@@ -92,7 +103,7 @@ end
 
 defmodule Bolt.Renderer do
   def render({path, content}) do
-    {path, transform(content, [], extension(path))}
+    {replace_extension(path), transform(content, [], extension(path))}
   end
 
   defp transform(content, _, :md) do
@@ -109,5 +120,14 @@ defmodule Bolt.Renderer do
 
   defp extension(path) do
     String.split(path, ".") |> Enum.reverse |> hd |> String.to_atom
+  end
+
+  defp replace_extension(path) do
+    remove_extension(path) <> ".html"
+  end
+
+  defp remove_extension(path) do
+    parts = String.split(path, ".") |> Enum.reverse |> tl |> Enum.reverse
+    Enum.join(parts, ".")
   end
 end
