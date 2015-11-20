@@ -4,6 +4,12 @@ defmodule Bolt.Cli do
     Bolt.New.run(System.cwd!, project_name)
   end
 
+  def main(["compile"]) do
+    IO.puts "Compiling..."
+    Bolt.Compiler.compile(System.cwd!)
+    IO.puts "Done."
+  end
+
   def main(["help"]) do
     IO.puts "Bolt v0.0.1" # TODO: How do you get project version from MIxfile when built with escript?
     IO.puts "Some useful help goes here."
