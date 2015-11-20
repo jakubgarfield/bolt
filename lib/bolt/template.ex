@@ -28,4 +28,9 @@ All the awesome features like
 * layouts
 """
   end
+
+  def style do
+"""
+"""
+  end
 end

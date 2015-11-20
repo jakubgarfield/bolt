@@ -12,7 +12,9 @@ defmodule Bolt.New do
   def initialize_structure(path) do
     File.mkdir!(Bolt.Path.layout(path))
     File.mkdir!(Bolt.Path.content(path))
+    File.mkdir!(Bolt.Path.assets(path))
     File.write!(Path.join(Bolt.Path.layout(path), "application.eex"), Bolt.Template.layout)
     File.write!(Path.join(Bolt.Path.content(path), "index.md"), Bolt.Template.index)
+    File.write!(Path.join(Bolt.Path.assets(path), "default.css"), Bolt.Template.style)
   end
 end
