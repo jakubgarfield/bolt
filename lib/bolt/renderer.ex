@@ -1,9 +1,11 @@
 defmodule Bolt.Renderer do
-  def render({path, content}) do
+  def render(path) do
+    content = File.read!(path)
     transform(content, [], Bolt.Path.extension(path))
   end
 
-  def render({path, content}, layout) do
+  def render(path, layout) do
+    content = File.read!(path)
     {metadata, content_without_metadata} = parse_metadata(content)
     {_, compiled_content} = transform(content_without_metadata, [], Bolt.Path.extension(path))
     transform(layout, [content: compiled_content, item: metadata], "eex")

@@ -3,17 +3,29 @@ defmodule Bolt.File do
     File.read!(Path.join(Bolt.Path.layout(location), "application.eex"))
   end
 
+  def content_directories(location) do
+    list_directories(Bolt.Path.content(location))
+  end
+
   def content_files(location) do
-    read_files(Bolt.Path.content(location))
+    list_files(Bolt.Path.content(location))
   end
 
   def asset_files(location) do
-    read_files(Bolt.Path.assets(location))
+    list_files(Bolt.Path.assets(location))
   end
 
-  defp read_files(location) do
-    File.ls!(location)
-    |> Enum.map(fn(filename) -> Path.join(location, filename) end)
-    |> Enum.map(fn(path) -> {path, File.read!(path)} end)
+  def asset_directories(location) do
+    list_directories(Bolt.Path.assets(location))
+  end
+
+  defp list_files(location) do
+    Path.wildcard(Path.join(location, "**"))
+    |> Enum.reject(fn(path) -> File.dir?(path) end)
+  end
+
+  defp list_directories(location) do
+    Path.wildcard(Path.join(location, "**"))
+    |> Enum.filter(fn(path) -> File.dir?(path) end)
   end
 end

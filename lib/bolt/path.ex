@@ -15,12 +15,12 @@ defmodule Bolt.Path do
     Path.join(location, "assets")
   end
 
-  def output_for_content(path, extension, location) do
-    String.replace(replace_extension(path, extension), content(location), output(location))
+  def output_for_content(path, location) do
+    String.replace(path, content(location), output(location))
   end
 
-  def output_for_assets(path, extension, location) do
-    String.replace(replace_extension(path, extension), assets(location), output(location))
+  def output_for_assets(path, location) do
+    String.replace(path, assets(location), output(location))
   end
 
   def extension(path) do
