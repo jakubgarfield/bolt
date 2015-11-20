@@ -7,7 +7,7 @@ defmodule Bolt.Mixfile do
      elixir: "~> 1.1",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
-     escript: [main_module: Bolt.Cli],
+     escript: escript,
      deps: deps]
   end
 
@@ -15,7 +15,11 @@ defmodule Bolt.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :yaml_elixir]]
+    [applications: [:logger, :yaml_elixir, :eex]]
+  end
+
+  def escript do
+    [main_module: Bolt.Cli, embed_elixir: true]
   end
 
   defp deps do
